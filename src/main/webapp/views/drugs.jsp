@@ -58,6 +58,13 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h2>Drugs</h2>
             </div>
+            <form action="<%=request.getContextPath()%>/drugs" method="get" class="form-inline mb-3">
+                <div class="form-group mr-2">
+                    <label for="keyword" class="mr-2">Search by Keyword:</label>
+                    <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Enter patient-related info or drug name" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
             <div class="table-responsive">
                 <table class="table table-striped table-sm">
                     <thead>

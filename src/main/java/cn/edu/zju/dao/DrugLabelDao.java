@@ -70,4 +70,36 @@ public class DrugLabelDao extends BaseDao {
         });
         return drugLabels;
     }
+
+    public List<DrugLabel> findByKeyword(String keyword) {
+        List<DrugLabel> drugLabels = new ArrayList<>();
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement("select id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, raw, drug_id from drug_label where id like ? or name like ? or obj_cls like ? or cast(alternate_drug_available as char) like ? or cast(dosing_information as char) like ? or prescribing_markdown like ? or source like ? or text_markdown like ? or summary_markdown like ? or raw like ? or drug_id like ?");
+                String likeKeyword = "%" + keyword + "%";
+                for (int i = 1; i <= 11; i++) {
+                    preparedStatement.setString(i, likeKeyword);
+                }
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String obj_cls = resultSet.getString("obj_cls");
+                    boolean alternate_drug_available = resultSet.getBoolean("alternate_drug_available");
+                    boolean dosing_information = resultSet.getBoolean("dosing_information");
+                    String prescribing_markdown = resultSet.getString("prescribing_markdown");
+                    String source = resultSet.getString("source");
+                    String text_markdown = resultSet.getString("text_markdown");
+                    String summary_markdown = resultSet.getString("summary_markdown");
+                    String raw = resultSet.getString("raw");
+                    String drug_id = resultSet.getString("drug_id");
+                    DrugLabel drugLabel = new DrugLabel(id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, raw, drug_id);
+                    drugLabels.add(drugLabel);
+                }
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return drugLabels;
+    }
 }

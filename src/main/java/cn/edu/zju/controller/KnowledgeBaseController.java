@@ -31,19 +31,37 @@ public class KnowledgeBaseController {
     }
 
     public void drugs(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<Drug> drugs = drugDao.findAll();
+        String keyword = request.getParameter("keyword");
+        List<Drug> drugs;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            drugs = drugDao.findByKeyword(keyword);
+        } else {
+            drugs = drugDao.findAll();
+        }
         request.setAttribute("drugs", drugs);
         request.getRequestDispatcher("/views/drugs.jsp").forward(request, response);
     }
 
     public void drugLabels(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<DrugLabel> drugs = drugLabelDao.findAll();
-        request.setAttribute("drugLabels", drugs);
+        String keyword = request.getParameter("keyword");
+        List<DrugLabel> drugLabels;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            drugLabels = drugLabelDao.findByKeyword(keyword);
+        } else {
+            drugLabels = drugLabelDao.findAll();
+        }
+        request.setAttribute("drugLabels", drugLabels);
         request.getRequestDispatcher("/views/drug_labels.jsp").forward(request, response);
     }
 
     public void dosingGuideline(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        List<DosingGuideline> dosingGuidelines = dosingGuidelineDao.findAll();
+        String keyword = request.getParameter("keyword");
+        List<DosingGuideline> dosingGuidelines;
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            dosingGuidelines = dosingGuidelineDao.findByKeyword(keyword);
+        } else {
+            dosingGuidelines = dosingGuidelineDao.findAll();
+        }
         request.setAttribute("dosingGuidelines", dosingGuidelines);
         request.getRequestDispatcher("/views/dosing_guideline.jsp").forward(request, response);
     }

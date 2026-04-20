@@ -58,4 +58,29 @@ public class DrugDao extends BaseDao {
         return drugs;
     }
 
+    public List<Drug> findByKeyword(String keyword) {
+        List<Drug> drugs = new ArrayList<>();
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement("select id,name,obj_cls,drug_url,biomarker from drug where id like ? or name like ? or obj_cls like ? or cast(biomarker as char) like ? or drug_url like ?");
+                String likeKeyword = "%" + keyword + "%";
+                for (int i = 1; i <= 5; i++) {
+                    preparedStatement.setString(i, likeKeyword);
+                }
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String name = resultSet.getString("name");
+                    String objCls = resultSet.getString("obj_cls");
+                    String drugUrl = resultSet.getString("drug_url");
+                    boolean biomarker = resultSet.getBoolean("biomarker");
+                    Drug drug = new Drug(id, name, biomarker, drugUrl, objCls);
+                    drugs.add(drug);
+                }
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return drugs;
+    }
 }

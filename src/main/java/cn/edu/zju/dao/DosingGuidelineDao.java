@@ -1,7 +1,6 @@
 package cn.edu.zju.dao;
 
 import cn.edu.zju.bean.DosingGuideline;
-import cn.edu.zju.bean.Drug;
 import cn.edu.zju.dbutils.DBUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,4 +65,33 @@ public class DosingGuidelineDao extends BaseDao {
         return dosingGuidelines;
     }
 
+    public List<DosingGuideline> findByKeyword(String keyword) {
+        List<DosingGuideline> dosingGuidelines = new ArrayList<>();
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement("select id,obj_cls,name,recommendation,drug_id,source,summary_markdown,text_markdown,raw from dosing_guideline where id like ? or obj_cls like ? or name like ? or cast(recommendation as char) like ? or drug_id like ? or source like ? or summary_markdown like ? or text_markdown like ? or raw like ?");
+                String likeKeyword = "%" + keyword + "%";
+                for (int i = 1; i <= 9; i++) {
+                    preparedStatement.setString(i, likeKeyword);
+                }
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    String id = resultSet.getString("id");
+                    String objCls = resultSet.getString("obj_cls");
+                    String name = resultSet.getString("name");
+                    boolean recommendation = resultSet.getBoolean("recommendation");
+                    String drugId = resultSet.getString("drug_id");
+                    String source = resultSet.getString("source");
+                    String summaryMarkdown = resultSet.getString("summary_markdown");
+                    String textMarkdown = resultSet.getString("text_markdown");
+                    String raw = resultSet.getString("raw");
+                    DosingGuideline dosingGuideline = new DosingGuideline(id, objCls, name, recommendation, drugId, source, summaryMarkdown, textMarkdown, raw);
+                    dosingGuidelines.add(dosingGuideline);
+                }
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return dosingGuidelines;
+    }
 }

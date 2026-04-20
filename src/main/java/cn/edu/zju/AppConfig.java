@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-public class AppConfig {
+public class    AppConfig {
 
     private static final Logger log = LoggerFactory.getLogger(AppConfig.class);
     private static final AppConfig instance = new AppConfig();
