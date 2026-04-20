@@ -68,6 +68,17 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
+            <div class="mb-3">
+                <label for="recommendationFilter">Filter by Recommendation:</label>
+                <select id="recommendationFilter" class="form-control mr-3">
+                    <option value="">All</option>
+                </select>
+                <label for="sourceFilter">Filter by Source:</label>
+                <select id="sourceFilter" class="form-control">
+                    <option value="">All</option>
+                </select>
+                <button id="applyFilters" class="btn btn-secondary btn-sm ml-2 mt-1">Apply Filters</button>
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-sm" id="dosingGuidelinesTable">
                     <thead>
@@ -105,6 +116,31 @@
             searching: false,
             paging: false,
             info: false
+        });
+        const recSet = new Set();
+        const srcSet = new Set();
+        $('#dosingGuidelinesTable tbody tr').each(function() {
+            recSet.add($(this).find('td').eq(2).text().trim());
+            srcSet.add($(this).find('td').eq(4).text().trim());
+        });
+        recSet.forEach(val => $('#recommendationFilter').append('<option value="' + val + '">' + val + '</option>'));
+        srcSet.forEach(val => $('#sourceFilter').append('<option value="' + val + '">' + val + '</option>'));
+    });
+    document.getElementById("applyFilters").addEventListener("click", function () {
+        const recSelected = document.getElementById("recommendationFilter").value;
+        const srcSelected = document.getElementById("sourceFilter").value;
+        const rows = document.querySelectorAll("#dosingGuidelinesTable tbody tr");
+
+        rows.forEach(row => {
+            const recCell = row.cells[2].innerText.trim();
+            const srcCell = row.cells[4].innerText.trim();
+            const recMatch = recSelected === "" || recCell === recSelected;
+            const srcMatch = srcSelected === "" || srcCell === srcSelected;
+            if (recMatch && srcMatch) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
         });
     });
 </script>

@@ -68,6 +68,13 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
+            <div class="mb-3">
+                <label for="biomarkerFilter">Filter by Biomarker:</label>
+                <select id="biomarkerFilter" class="form-control">
+                    <option value="">All</option>
+                </select>
+                <button id="applyFilters" class="btn btn-secondary btn-sm ml-2 mt-1">Apply Filters</button>
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-sm" id="drugsTable">
                     <thead>
@@ -101,6 +108,24 @@
             searching: false,
             paging: false,
             info: false
+        });
+        const bioSet = new Set();
+        $('#drugsTable tbody tr').each(function() {
+            bioSet.add($(this).find('td').eq(3).text().trim());
+        });
+        bioSet.forEach(val => $('#biomarkerFilter').append('<option value="' + val + '">' + val + '</option>'));
+    });
+    document.getElementById("applyFilters").addEventListener("click", function () {
+        const selected = document.getElementById("biomarkerFilter").value;
+        const rows = document.querySelectorAll("#drugsTable tbody tr");
+
+        rows.forEach(row => {
+            const biomarkerCell = row.cells[3].innerText.trim();
+            if (selected === "" || biomarkerCell === selected) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
         });
     });
 </script>

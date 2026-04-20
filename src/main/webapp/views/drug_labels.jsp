@@ -68,6 +68,17 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
+            <div class="mb-3">
+                <label for="sourceFilter">Filter by Source:</label>
+                <select id="sourceFilter" class="form-control mr-3">
+                    <option value="">All</option>
+                </select>
+                <label for="dosingFilter">Filter by Dosing Information:</label>
+                <select id="dosingFilter" class="form-control">
+                    <option value="">All</option>
+                </select>
+                <button id="applyFilters" class="btn btn-secondary btn-sm ml-2 mt-1">Apply Filters</button>
+            </div>
             <div class="table-responsive">
                 <table class="table table-striped table-sm" id="drugLabelsTable">
                     <thead>
@@ -101,6 +112,31 @@
             searching: false,
             paging: false,
             info: false
+        });
+        const srcSet = new Set();
+        const dosSet = new Set();
+        $('#drugLabelsTable tbody tr').each(function() {
+            srcSet.add($(this).find('td').eq(1).text().trim());
+            dosSet.add($(this).find('td').eq(2).text().trim());
+        });
+        srcSet.forEach(val => $('#sourceFilter').append('<option value="' + val + '">' + val + '</option>'));
+        dosSet.forEach(val => $('#dosingFilter').append('<option value="' + val + '">' + val + '</option>'));
+    });
+    document.getElementById("applyFilters").addEventListener("click", function () {
+        const srcSelected = document.getElementById("sourceFilter").value;
+        const dosSelected = document.getElementById("dosingFilter").value;
+        const rows = document.querySelectorAll("#drugLabelsTable tbody tr");
+
+        rows.forEach(row => {
+            const srcCell = row.cells[1].innerText.trim();
+            const dosCell = row.cells[2].innerText.trim();
+            const srcMatch = srcSelected === "" || srcCell === srcSelected;
+            const dosMatch = dosSelected === "" || dosCell === dosSelected;
+            if (srcMatch && dosMatch) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
         });
     });
 </script>
