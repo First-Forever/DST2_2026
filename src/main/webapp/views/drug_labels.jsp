@@ -21,7 +21,10 @@
 
     <!-- Bootstrap core CSS -->
     <link href="<%=request.getContextPath()%>/static/bootstrap/css/bootstrap.css" rel="stylesheet">
+    <link href="<%=request.getContextPath()%>/static/datatables/dataTables.bootstrap4.min.css" rel="stylesheet">
     <script src="<%=request.getContextPath()%>/static/jquery/jquery-3.4.1.js"></script>
+    <script src="<%=request.getContextPath()%>/static/datatables/jquery.dataTables.min.js"></script>
+    <script src="<%=request.getContextPath()%>/static/datatables/dataTables.bootstrap4.min.js"></script>
     <script src="<%=request.getContextPath()%>/static/bootstrap/js/bootstrap.bundle.min.js"></script>
     <!-- Custom styles for this template -->
     <link href="<%=request.getContextPath()%>/static/css/app.css" rel="stylesheet">
@@ -66,7 +69,7 @@
                 <button type="submit" class="btn btn-primary">Search</button>
             </form>
             <div class="table-responsive">
-                <table class="table table-striped table-sm">
+                <table class="table table-striped table-sm" id="drugLabelsTable">
                     <thead>
                     <tr>
                         <th>#</th>
@@ -91,5 +94,15 @@
         </main>
     </div>
 </div>
+
+<script>
+    $(document).ready(function() {
+        $('#drugLabelsTable').DataTable({
+            searching: false,
+            paging: false,
+            info: false
+        });
+    });
+</script>
 </body>
 </html>
