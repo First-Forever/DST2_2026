@@ -80,9 +80,9 @@ public class DrugLabelDao extends BaseDao {
         List<DrugLabel> drugLabels = new ArrayList<>();
         DBUtils.execSQL(connection -> {
             try {
-                PreparedStatement preparedStatement = connection.prepareStatement("select id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, raw, drug_id from drug_label where id like ? or name like ? or obj_cls like ? or cast(alternate_drug_available as char) like ? or cast(dosing_information as char) like ? or prescribing_markdown like ? or source like ? or text_markdown like ? or summary_markdown like ? or raw like ? or drug_id like ?");
+                PreparedStatement preparedStatement = connection.prepareStatement("select id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, efficacy_summary, response_warning, alternative_drug, raw, drug_id from drug_label where id like ? or name like ? or obj_cls like ? or cast(alternate_drug_available as char) like ? or cast(dosing_information as char) like ? or prescribing_markdown like ? or source like ? or text_markdown like ? or summary_markdown like ? or efficacy_summary like ? or response_warning like ? or alternative_drug like ? or raw like ? or drug_id like ?");
                 String likeKeyword = "%" + keyword + "%";
-                for (int i = 1; i <= 11; i++) {
+                for (int i = 1; i <= 14; i++) {
                     preparedStatement.setString(i, likeKeyword);
                 }
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -96,9 +96,12 @@ public class DrugLabelDao extends BaseDao {
                     String source = resultSet.getString("source");
                     String text_markdown = resultSet.getString("text_markdown");
                     String summary_markdown = resultSet.getString("summary_markdown");
+                    String efficacy_summary = resultSet.getString("efficacy_summary");
+                    String response_warning = resultSet.getString("response_warning");
+                    String alternative_drug = resultSet.getString("alternative_drug");
                     String raw = resultSet.getString("raw");
                     String drug_id = resultSet.getString("drug_id");
-                    DrugLabel drugLabel = new DrugLabel(id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, raw, drug_id);
+                    DrugLabel drugLabel = new DrugLabel(id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, efficacy_summary, response_warning, alternative_drug, raw, drug_id);
                     drugLabels.add(drugLabel);
                 }
             } catch (SQLException e) {
