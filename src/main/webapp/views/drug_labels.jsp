@@ -84,18 +84,24 @@
                     <thead>
                     <tr>
                         <th>#</th>
+                        <th>Name</th>
                         <th>Source</th>
                         <th>Dosing Information</th>
-                        <th>Summary Markdown</th>
+                        <th>Efficacy Summary</th>
+                        <th>Response Warning</th>
+                        <th>Alternative Drug</th>
                     </tr>
                     </thead>
                     <tbody>
                     <c:forEach items="${drugLabels}" var="item">
                         <tr>
                             <td>${item.id}</td>
+                            <td>${item.name}</td>
                             <td>${item.source}</td>
                             <td>${item.dosingInformation}</td>
-                            <td>${item.summaryMarkdown}</td>
+                            <td>${item.efficacySummary}</td>
+                            <td>${item.responseWarning}</td>
+                            <td>${item.alternativeDrug}</td>
                         </tr>
                     </c:forEach>
 
