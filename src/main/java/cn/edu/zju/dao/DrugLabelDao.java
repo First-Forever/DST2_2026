@@ -1,6 +1,5 @@
 package cn.edu.zju.dao;
 
-import cn.edu.zju.bean.Drug;
 import cn.edu.zju.bean.DrugLabel;
 import cn.edu.zju.dbutils.DBUtils;
 import org.slf4j.Logger;
@@ -23,7 +22,7 @@ public class DrugLabelDao extends BaseDao {
     public void saveDrugLabel(DrugLabel drugLabel) {
         DBUtils.execSQL(connection -> {
             try {
-                PreparedStatement preparedStatement = connection.prepareStatement("insert into drug_label (id,name,obj_cls,alternate_drug_available,dosing_information,prescribing_markdown,source,text_markdown,summary_markdown,raw,drug_id) values (?,?,?,?,?,?,?,?,?,?,?)");
+                PreparedStatement preparedStatement = connection.prepareStatement("insert into drug_label (id,name,obj_cls,alternate_drug_available,dosing_information,prescribing_markdown,source,text_markdown,summary_markdown,efficacy_summary,response_warning,alternative_drug,raw,drug_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
                 preparedStatement.setString(1, drugLabel.getId());
                 preparedStatement.setString(2, drugLabel.getName());
                 preparedStatement.setString(3, drugLabel.getObjCls());
@@ -33,8 +32,11 @@ public class DrugLabelDao extends BaseDao {
                 preparedStatement.setString(7, drugLabel.getSource());
                 preparedStatement.setString(8, drugLabel.getTextMarkdown());
                 preparedStatement.setString(9, drugLabel.getSummaryMarkdown());
-                preparedStatement.setString(10, drugLabel.getRaw());
-                preparedStatement.setString(11, drugLabel.getDrugId());
+                preparedStatement.setString(10, drugLabel.getEfficacySummary());
+                preparedStatement.setString(11, drugLabel.getResponseWarning());
+                preparedStatement.setString(12, drugLabel.getAlternativeDrug());
+                preparedStatement.setString(13, drugLabel.getRaw());
+                preparedStatement.setString(14, drugLabel.getDrugId());
                 preparedStatement.execute();
             } catch (SQLException e) {
                 log.info("", e);
@@ -47,7 +49,7 @@ public class DrugLabelDao extends BaseDao {
         List<DrugLabel> drugLabels = new ArrayList<>();
         DBUtils.execSQL(connection -> {
             try {
-                PreparedStatement preparedStatement = connection.prepareStatement("select id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, raw, drug_id from drug_label");
+                PreparedStatement preparedStatement = connection.prepareStatement("select id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, efficacy_summary, response_warning, alternative_drug, raw, drug_id from drug_label");
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
                     String id = resultSet.getString("id");
@@ -59,9 +61,12 @@ public class DrugLabelDao extends BaseDao {
                     String source = resultSet.getString("source");
                     String text_markdown = resultSet.getString("text_markdown");
                     String summary_markdown = resultSet.getString("summary_markdown");
+                    String efficacy_summary = resultSet.getString("efficacy_summary");
+                    String response_warning = resultSet.getString("response_warning");
+                    String alternative_drug = resultSet.getString("alternative_drug");
                     String raw = resultSet.getString("raw");
                     String drug_id = resultSet.getString("drug_id");
-                    DrugLabel drugLabel = new DrugLabel(id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, raw, drug_id);
+                    DrugLabel drugLabel = new DrugLabel(id, name, obj_cls, alternate_drug_available, dosing_information, prescribing_markdown, source, text_markdown, summary_markdown, efficacy_summary, response_warning, alternative_drug, raw, drug_id);
                     drugLabels.add(drugLabel);
                 }
             } catch (SQLException e) {

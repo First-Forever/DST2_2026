@@ -11,9 +11,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -109,10 +113,13 @@ public class PharmGKBImporter {
             String source = (String) x.get("source");
             String textMarkdown = ((String) ((Map) x.get("textMarkdown")).get("html"));
             String summaryMarkdown = ((String) ((Map) x.get("summaryMarkdown")).get("html"));
+            String efficacySummary = (String) x.get("efficacy_summary");
+            String responseWarning = (String) x.get("response_warning");
+            String alternativeDrug = (String) x.get("alternative_drug");
             String raw = gson.toJson(x);
             String drugId = ((String) ((List<Map>) x.get("relatedChemicals")).get(0).get("id"));
             DrugLabel drugLabelBean = new DrugLabel(labelId, name, objCls, alternateDrugAvailable, dosingInformation
-                    , prescribingMarkdown, source, textMarkdown, summaryMarkdown, raw, drugId);
+                    , prescribingMarkdown, source, textMarkdown, summaryMarkdown, efficacySummary, responseWarning, alternativeDrug, raw, drugId);
             if (!drugLabelDao.existsById(labelId)) {
                 drugLabelDao.saveDrugLabel(drugLabelBean);
                 log.info("Saved: {}", labelId);
@@ -120,5 +127,28 @@ public class PharmGKBImporter {
                 log.info("Label {} already exist, skip", labelId);
             }
         });
+    }
+
+    private List<String> readDataLines(String fileName) {
+        try {
+            Path workspacePath = new File(fileName).toPath();
+            if (Files.exists(workspacePath)) {
+                return Files.readAllLines(workspacePath, StandardCharsets.UTF_8);
+            }
+
+            InputStream is = getClass().getResourceAsStream("/" + fileName);
+            if (is == null) {
+                throw new IllegalStateException("Cannot find data file: " + fileName);
+            }
+            try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                return bufferedReader.lines().collect(toList());
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read data file: " + fileName, e);
+        }
+    }
+
+    private String readDataAsString(String fileName) {
+        return String.join("\n", readDataLines(fileName));
     }
 }
