@@ -22,7 +22,7 @@ public class DrugLabelDao extends BaseDao {
     public void saveDrugLabel(DrugLabel drugLabel) {
         DBUtils.execSQL(connection -> {
             try {
-                PreparedStatement preparedStatement = connection.prepareStatement("insert into drug_label (id,name,obj_cls,alternate_drug_available,dosing_information,prescribing_markdown,source,text_markdown,summary_markdown,efficacy_summary,response_warning,alternative_drug,raw,drug_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                PreparedStatement preparedStatement = connection.prepareStatement("insert into drug_label (id,name,obj_cls,alternate_drug_available,dosing_information,prescribing_markdown,source,text_markdown,summary_markdown,efficacy_summary,response_warning,alternative_drug,raw,drug_id) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?) on duplicate key update name=values(name), obj_cls=values(obj_cls), alternate_drug_available=values(alternate_drug_available), dosing_information=values(dosing_information), prescribing_markdown=values(prescribing_markdown), source=values(source), text_markdown=values(text_markdown), summary_markdown=values(summary_markdown), efficacy_summary=values(efficacy_summary), response_warning=values(response_warning), alternative_drug=values(alternative_drug), raw=values(raw), drug_id=values(drug_id)");
                 preparedStatement.setString(1, drugLabel.getId());
                 preparedStatement.setString(2, drugLabel.getName());
                 preparedStatement.setString(3, drugLabel.getObjCls());

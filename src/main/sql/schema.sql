@@ -201,14 +201,14 @@ create table drug_label
     obj_cls varchar(100) null,
     alternate_drug_available tinyint(1) null,
     dosing_information tinyint(1) null,
-    prescribing_markdown varchar(2000) null,
+    prescribing_markdown longtext null,
     source varchar(100) null,
-    text_markdown varchar(4000) null,
-    summary_markdown varchar(1000) null,
+    text_markdown longtext null,
+    summary_markdown text null,
     efficacy_summary text null,
     response_warning text null,
     alternative_drug text null,
-    raw text null,
+    raw longtext null,
     drug_id varchar(100) null,
     constraint drug_label_id_uindex
         unique (id)
