@@ -1,10 +1,5 @@
 package cn.edu.zju.crawler;
 
-import cn.edu.zju.bean.Drug;
-import cn.edu.zju.bean.DrugLabel;
-import cn.edu.zju.dao.DrugDao;
-import cn.edu.zju.dao.DrugLabelDao;
-import cn.edu.zju.dbutils.DBUtils;
 import com.google.gson.Gson;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +10,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import java.util.LinkedHashMap;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
