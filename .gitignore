@@ -5,3 +5,4 @@ target
 .classpath
 .vscode/settings.json
 .local-data
+/*.data
