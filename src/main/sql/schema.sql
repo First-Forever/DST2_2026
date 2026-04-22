@@ -224,3 +224,19 @@ create table sample
     created_at datetime null,
     uploaded_by text null
 );
+
+create table app_user
+(
+    id int auto_increment
+        primary key,
+    username varchar(100) not null,
+    password_hash varchar(255) not null,
+    email varchar(255) not null,
+    permission varchar(50) not null default 'NORMAL_USER',
+    admin_approved tinyint(1) not null default 0,
+    created_at datetime null,
+    constraint app_user_username_uindex
+        unique (username),
+    constraint app_user_email_uindex
+        unique (email)
+);
