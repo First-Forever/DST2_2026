@@ -11,7 +11,7 @@
     <div class="sidebar-sticky">
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a class='nav-link ${param.active == "dashboard" ? "active" : ""}' href="<%=request.getContextPath()%>/">
+                <a class='nav-link ${param.active == "dashboard" ? "active" : ""}' href="<%=request.getContextPath()%>/dashboard">
                     <span data-feather="home"></span>
                     Dashboard <span class="sr-only">(current)</span>
                 </a>
