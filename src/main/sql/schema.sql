@@ -162,12 +162,12 @@ create table dosing_guideline
 (
     id varchar(100) not null,
     obj_cls varchar(100) null,
-    name varchar(100) null,
+    name text null,
     recommendation tinyint(1) null,
     drug_id varchar(100) null,
     source varchar(100) null,
-    summary_markdown varchar(2000) null,
-    text_markdown text null,
+    summary_markdown longtext null,
+    text_markdown longtext null,
     raw longtext null,
     constraint dosing_guideline_id_uindex
         unique (id)
@@ -181,7 +181,7 @@ create table drug
     id varchar(100) not null,
     name varchar(500) null,
     obj_cls varchar(100) null,
-    drug_url varchar(100) null,
+    drug_url text null,
     biomarker tinyint(1) null,
     constraint drug_id_uindex
         unique (id)
@@ -193,18 +193,18 @@ alter table drug
 create table drug_label
 (
     id varchar(100) not null,
-    name varchar(200) null,
+    name text null,
     obj_cls varchar(100) null,
     alternate_drug_available tinyint(1) null,
     dosing_information tinyint(1) null,
-    prescribing_markdown varchar(2000) null,
+    prescribing_markdown longtext null,
     source varchar(100) null,
-    text_markdown varchar(4000) null,
-    summary_markdown varchar(1000) null,
-    efficacy_summary text null,
-    response_warning text null,
-    alternative_drug text null,
-    raw text null,
+    text_markdown longtext null,
+    summary_markdown longtext null,
+    efficacy_summary longtext null,
+    response_warning longtext null,
+    alternative_drug longtext null,
+    raw longtext null,
     drug_id varchar(100) null,
     constraint drug_label_id_uindex
         unique (id)
@@ -212,6 +212,26 @@ create table drug_label
 
 alter table drug_label
     add primary key (id);
+
+create table drug_professional_info
+(
+    id bigint auto_increment
+        primary key,
+    drug_name varchar(255) not null,
+    related_genes text null,
+    source_type varchar(100) not null,
+    evidence_level varchar(100) null,
+    guideline_or_label_tags text null,
+    literature_summary longtext null,
+    pmid_list text null,
+    source_url text null
+);
+
+create index drug_professional_info_drug_name_idx
+    on drug_professional_info (drug_name);
+
+create index drug_professional_info_source_type_idx
+    on drug_professional_info (source_type);
 
 create table sample
 (
