@@ -17,7 +17,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="generator" content="">
-    <title>Dashboard Template 路 Bootstrap</title>
+    <title>Dashboard Template Bootstrap</title>
 
     <!-- Bootstrap core CSS -->
     <link href="<%=request.getContextPath()%>/static/bootstrap/css/bootstrap.css" rel="stylesheet">
@@ -61,43 +61,50 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h2>Drug Professional Info</h2>
             </div>
-            <form action="<%=request.getContextPath()%>/drugProfessionalInfo" method="get" class="mb-3">
-                <div class="form-group mr-2">
-                    <label for="keyword" class="mr-2">Search by Keyword:</label>
+            <form action="<%=request.getContextPath()%>/drugProfessionalInfo" method="get" class="kb-filter-form">
+                <div class="kb-filter-group">
+                    <label for="keyword">Search by Keyword:</label>
                     <input type="text" class="form-control" id="keyword" name="keyword" value="${selectedKeyword}" placeholder="Enter drug name, gene, source type or PMID">
                 </div>
-                <label for="sourceTypeFilter">Filter by Source Type:</label>
-                <select id="sourceTypeFilter" name="sourceType" class="form-control mr-3">
-                    <option value="">All</option>
-                    <c:forEach items="${sourceTypeOptions}" var="option">
-                        <c:choose>
-                            <c:when test="${selectedSourceType == option}">
-                                <option value="${option}" selected="selected">${option}</option>
-                            </c:when>
-                            <c:otherwise>
-                                <option value="${option}">${option}</option>
-                            </c:otherwise>
-                        </c:choose>
-                    </c:forEach>
-                </select>
-                <label for="evidenceLevelFilter">Filter by Evidence Level:</label>
-                <select id="evidenceLevelFilter" name="evidenceLevel" class="form-control mr-3">
-                    <option value="">All</option>
-                    <c:forEach items="${evidenceLevelOptions}" var="option">
-                        <c:choose>
-                            <c:when test="${selectedEvidenceLevel == option}">
-                                <option value="${option}" selected="selected">${option}</option>
-                            </c:when>
-                            <c:otherwise>
-                                <option value="${option}">${option}</option>
-                            </c:otherwise>
-                        </c:choose>
-                    </c:forEach>
-                </select>
-                <button type="submit" class="btn btn-primary mr-2">Search</button>
-                <a href="<%=request.getContextPath()%>/drugProfessionalInfo" class="btn btn-outline-secondary">Reset</a>
+                <div class="kb-filter-group">
+                    <label for="sourceTypeFilter">Filter by Source Type:</label>
+                    <select id="sourceTypeFilter" name="sourceType" class="form-control">
+                        <option value="">All</option>
+                        <c:forEach items="${sourceTypeOptions}" var="option">
+                            <c:choose>
+                                <c:when test="${selectedSourceType == option}">
+                                    <option value="${option}" selected="selected">${option}</option>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="${option}">${option}</option>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="kb-filter-group">
+                    <label for="evidenceLevelFilter">Filter by Evidence Level:</label>
+                    <select id="evidenceLevelFilter" name="evidenceLevel" class="form-control">
+                        <option value="">All</option>
+                        <c:forEach items="${evidenceLevelOptions}" var="option">
+                            <c:choose>
+                                <c:when test="${selectedEvidenceLevel == option}">
+                                    <option value="${option}" selected="selected">${option}</option>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="${option}">${option}</option>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="kb-filter-actions" style="padding-top: 1.75rem;">
+                    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                    <button type="submit" class="btn btn-outline-primary btn-sm">Apply Filters</button>
+                    <a href="<%=request.getContextPath()%>/drugProfessionalInfo" class="btn btn-outline-secondary btn-sm">Reset</a>
+                </div>
             </form>
-            <div class="table-responsive">
+            <div class="table-responsive" style="margin-top: 2rem;">
                 <table class="table table-striped table-sm" id="drugProfessionalInfoTable">
                     <thead>
                     <tr>

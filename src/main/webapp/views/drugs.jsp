@@ -61,21 +61,24 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <h2>Drugs</h2>
             </div>
-            <form action="<%=request.getContextPath()%>/drugs" method="get" class="form-inline mb-3">
-                <div class="form-group mr-2">
-                    <label for="keyword" class="mr-2">Search by Keyword:</label>
-                    <input type="text" class="form-control" id="keyword" name="keyword" placeholder="Enter patient-related info or drug name" required>
+            <form action="<%=request.getContextPath()%>/drugs" method="get" class="kb-filter-form">
+                <div class="kb-filter-group">
+                    <label for="keyword">Search by Keyword:</label>
+                    <input type="text" class="form-control" id="keyword" name="keyword" value="${param.keyword}" placeholder="Enter patient-related info or drug name">
                 </div>
-                <button type="submit" class="btn btn-primary">Search</button>
+                <div class="kb-filter-group">
+                    <label for="biomarkerFilter">Filter by Biomarker:</label>
+                    <select id="biomarkerFilter" class="form-control">
+                        <option value="">All</option>
+                    </select>
+                </div>
+                <div class="kb-filter-actions" style="padding-top: 1.75rem;">
+                    <button type="submit" class="btn btn-primary btn-sm">Search</button>
+                    <button type="button" id="applyFilters" class="btn btn-outline-primary btn-sm">Apply Filters</button>
+                    <a href="<%=request.getContextPath()%>/drugs" class="btn btn-outline-secondary btn-sm">Reset</a>
+                </div>
             </form>
-            <div class="mb-3">
-                <label for="biomarkerFilter">Filter by Biomarker:</label>
-                <select id="biomarkerFilter" class="form-control">
-                    <option value="">All</option>
-                </select>
-                <button id="applyFilters" class="btn btn-secondary btn-sm ml-2 mt-1">Apply Filters</button>
-            </div>
-            <div class="table-responsive">
+            <div class="table-responsive" style="margin-top: 2rem;">
                 <table class="table table-striped table-sm" id="drugsTable">
                     <thead>
                     <tr>

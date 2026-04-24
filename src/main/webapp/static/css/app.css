@@ -104,3 +104,48 @@ body {
     border-color: transparent;
     box-shadow: 0 0 0 3px rgba(255, 255, 255, .25);
 }
+
+.kb-filter-form {
+    display: grid;
+    row-gap: 1.5rem;
+    margin-bottom: 2.75rem;
+}
+
+.kb-filter-group {
+    margin-bottom: 0;
+}
+
+.kb-filter-group label {
+    display: block;
+    margin-bottom: .65rem;
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+.kb-filter-group .form-control {
+    max-width: 100%;
+}
+
+.kb-filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: .75rem;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+}
+
+.kb-filter-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 96px;
+    padding: .4rem .95rem;
+    line-height: 1.35;
+}
+
+@media (max-width: 767.98px) {
+    .kb-filter-actions .btn {
+        width: 100%;
+    }
+}
