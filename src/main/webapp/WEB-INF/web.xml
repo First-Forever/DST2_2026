@@ -4,6 +4,16 @@
 
 <web-app>
   <display-name>Archetype Created Web Application</display-name>
+
+  <filter>
+    <filter-name>viewAccessFilter</filter-name>
+    <filter-class>cn.edu.zju.servlet.ViewAccessFilter</filter-class>
+  </filter>
+
+  <filter-mapping>
+    <filter-name>viewAccessFilter</filter-name>
+    <url-pattern>/views/*</url-pattern>
+  </filter-mapping>
   
   <servlet>
     <servlet-name>dispatchServlet</servlet-name>

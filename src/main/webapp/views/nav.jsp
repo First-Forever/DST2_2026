@@ -5,8 +5,15 @@
   Time: 17:04
   To change this template use File | Settings | File Templates.
 --%>
+<%@ page import="cn.edu.zju.bean.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
+<%
+    User currentUser = (User) session.getAttribute("currentUser");
+    boolean canAccessProfessionalInfo = currentUser != null
+            && (currentUser.getPermission() == User.Permission.PROFESSIONAL_USER
+            || currentUser.getPermission() == User.Permission.ADMIN);
+%>
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
         <ul class="nav flex-column">
@@ -55,12 +62,14 @@
                     Dosing Guideline
                 </a>
             </li>
+            <% if (canAccessProfessionalInfo) { %>
             <li class="nav-item">
                 <a class='nav-link ${param.active == "drug_professional_info" ? "active" : ""}' href="<%=request.getContextPath()%>/drugProfessionalInfo">
                     <span data-feather="file-text"></span>
                     Drug Professional Info
                 </a>
             </li>
+            <% } %>
         </ul>
     </div>
 </nav>
