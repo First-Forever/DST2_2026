@@ -33,7 +33,7 @@ public class UserDao extends BaseDao {
                 preparedStatement.setString(2, user.getPasswordHash());
                 preparedStatement.setString(3, user.getEmail());
                 preparedStatement.setString(4, user.getPermission().name());
-                preparedStatement.setBoolean(5, false);
+                preparedStatement.setBoolean(5, user.isAdminApproved());
                 preparedStatement.setTimestamp(6, toTimestamp(user.getCreatedAt()));
                 preparedStatement.executeUpdate();
                 ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
@@ -45,6 +45,24 @@ public class UserDao extends BaseDao {
             }
         });
         return key.get();
+    }
+
+    public List<User> findAll() {
+        List<User> users = new ArrayList<>();
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        "select id, username, password_hash, email, permission, admin_approved, created_at " +
+                                "from app_user order by created_at desc, id desc");
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    users.add(mapUser(resultSet));
+                }
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return users;
     }
 
     public User findById(int id) {
@@ -109,6 +127,14 @@ public class UserDao extends BaseDao {
         return existsByColumn("email", email);
     }
 
+    public boolean existsByUsernameExceptId(String username, int id) {
+        return existsByColumnExceptId("username", username, id);
+    }
+
+    public boolean existsByEmailExceptId(String email, int id) {
+        return existsByColumnExceptId("email", email, id);
+    }
+
     public List<User> findPendingAdmins() {
         List<User> users = new ArrayList<>();
         DBUtils.execSQL(connection -> {
@@ -164,6 +190,41 @@ public class UserDao extends BaseDao {
         return updated.get();
     }
 
+    public boolean update(User user) {
+        AtomicBoolean updated = new AtomicBoolean(false);
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        "update app_user set username = ?, password_hash = ?, email = ?, permission = ?, admin_approved = ? where id = ?");
+                preparedStatement.setString(1, user.getUsername());
+                preparedStatement.setString(2, user.getPasswordHash());
+                preparedStatement.setString(3, user.getEmail());
+                preparedStatement.setString(4, user.getPermission().name());
+                preparedStatement.setBoolean(5, user.isAdminApproved());
+                preparedStatement.setInt(6, user.getId());
+                updated.set(preparedStatement.executeUpdate() > 0);
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return updated.get();
+    }
+
+    public boolean deleteById(int id) {
+        AtomicBoolean deleted = new AtomicBoolean(false);
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        "delete from app_user where id = ?");
+                preparedStatement.setInt(1, id);
+                deleted.set(preparedStatement.executeUpdate() > 0);
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return deleted.get();
+    }
+
     private boolean existsByColumn(String columnName, String value) {
         AtomicBoolean exists = new AtomicBoolean(false);
         DBUtils.execSQL(connection -> {
@@ -171,6 +232,25 @@ public class UserDao extends BaseDao {
                 PreparedStatement preparedStatement = connection.prepareStatement(
                         String.format("select 1 from app_user where %s = ?", columnName));
                 preparedStatement.setString(1, value);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    exists.set(true);
+                }
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return exists.get();
+    }
+
+    private boolean existsByColumnExceptId(String columnName, String value, int id) {
+        AtomicBoolean exists = new AtomicBoolean(false);
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        String.format("select 1 from app_user where %s = ? and id <> ?", columnName));
+                preparedStatement.setString(1, value);
+                preparedStatement.setInt(2, id);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
                     exists.set(true);

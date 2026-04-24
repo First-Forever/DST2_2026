@@ -13,6 +13,7 @@
     boolean canAccessProfessionalInfo = currentUser != null
             && (currentUser.getPermission() == User.Permission.PROFESSIONAL_USER
             || currentUser.getPermission() == User.Permission.ADMIN);
+    boolean isAdmin = currentUser != null && currentUser.getPermission() == User.Permission.ADMIN;
 %>
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
@@ -35,6 +36,14 @@
                     Samples
                 </a>
             </li>
+            <% if (isAdmin) { %>
+            <li class="nav-item">
+                <a class='nav-link ${param.active == "admin_users" ? "active" : ""}' href="<%=request.getContextPath()%>/admin/users">
+                    <span data-feather="users"></span>
+                    User Management
+                </a>
+            </li>
+            <% } %>
         </ul>
 
         <h6 class="sidebar-heading d-flex justify-content-between align-items-center px-3 mt-4 mb-1 text-muted">

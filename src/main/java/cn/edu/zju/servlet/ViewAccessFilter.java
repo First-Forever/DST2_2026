@@ -17,6 +17,7 @@ public class ViewAccessFilter implements Filter {
 
     private static final Set<String> PUBLIC_VIEWS = Set.of("/views/welcome.jsp", "/views/register.jsp");
     private static final Set<String> PROFESSIONAL_ONLY_VIEWS = Set.of("/views/drug_professional_info.jsp");
+    private static final Set<String> ADMIN_ONLY_VIEWS = Set.of("/views/user_management.jsp");
 
     @Override
     public void init(FilterConfig filterConfig) {
@@ -42,6 +43,11 @@ public class ViewAccessFilter implements Filter {
 
         if (PROFESSIONAL_ONLY_VIEWS.contains(viewPath) && !hasProfessionalAccess(currentUser)) {
             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Professional users or administrators only.");
+            return;
+        }
+
+        if (ADMIN_ONLY_VIEWS.contains(viewPath) && currentUser.getPermission() != User.Permission.ADMIN) {
+            httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Administrators only.");
             return;
         }
 

@@ -1,6 +1,7 @@
 package cn.edu.zju.servlet;
 
 import cn.edu.zju.bean.User;
+import cn.edu.zju.controller.AdminController;
 import cn.edu.zju.controller.IndexController;
 import cn.edu.zju.controller.KnowledgeBaseController;
 import cn.edu.zju.controller.MatchingController;
@@ -59,6 +60,9 @@ public class DispatchServlet extends HttpServlet {
 
         MatchingController matchingController = new MatchingController();
         matchingController.register(dispatcher);
+
+        AdminController adminController = new AdminController();
+        adminController.register(dispatcher);
 
     }
 
