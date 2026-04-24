@@ -65,7 +65,7 @@ public class AdminController {
         try {
             Permission permission = permissionValue.isEmpty() ? Permission.NORMAL_USER : Permission.valueOf(permissionValue);
             boolean adminApproved = permission == Permission.ADMIN;
-            User user = new User(0, username, hashPassword(password), email, permission, adminApproved, new Date());
+            User user = User.createByAdmin(0, username, hashPassword(password), email, permission, adminApproved, new Date());
             int id = userDao.save(user);
             if (id == 0) {
                 redirectToUserManagement(response, request, null, "Failed to create user.");
@@ -120,7 +120,8 @@ public class AdminController {
             Permission permission = permissionValue.isEmpty() ? existingUser.getPermission() : Permission.valueOf(permissionValue);
             String passwordHash = password.isEmpty() ? existingUser.getPasswordHash() : hashPassword(password);
             boolean adminApproved = permission == Permission.ADMIN;
-            User updatedUser = new User(id, username, passwordHash, email, permission, adminApproved, existingUser.getCreatedAt());
+            User updatedUser = User.createByAdmin(id, username, passwordHash, email, permission, adminApproved,
+                    existingUser.getCreatedAt());
             if (!userDao.update(updatedUser)) {
                 redirectToUserManagement(response, request, null, "Failed to update user.");
                 return;

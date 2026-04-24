@@ -271,7 +271,7 @@ public class UserDao extends BaseDao {
         boolean adminApproved = resultSet.getBoolean("admin_approved");
         Timestamp createdAtTimestamp = resultSet.getTimestamp("created_at");
         Date createdAt = createdAtTimestamp == null ? null : new Date(createdAtTimestamp.getTime());
-        return new User(id, username, passwordHash, email, permission, adminApproved, createdAt);
+        return User.fromPersistence(id, username, passwordHash, email, permission, adminApproved, createdAt);
     }
 
     private Timestamp toTimestamp(Date date) {

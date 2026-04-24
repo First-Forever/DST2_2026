@@ -109,8 +109,9 @@
                             </select>
                         </div>
                         <div class="hint-box mb-4">
-                            Professional users and administrators must use a ZJU email. The first administrator is
-                            approved automatically; later administrators need approval after registration.
+                            Self-registration for professional users and administrators requires a ZJU email. The first
+                            administrator is approved automatically; later administrators need approval after
+                            registration.
                         </div>
                         <button type="submit" class="btn btn-primary btn-register btn-block">Register</button>
                     </form>

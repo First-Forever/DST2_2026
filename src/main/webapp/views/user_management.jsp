@@ -124,7 +124,7 @@
                             </div>
                         </div>
                     </form>
-                    <p class="admin-note mb-0">Professional users and administrators must use a ZJU email. Newly created administrators are approved immediately.</p>
+                    <p class="admin-note mb-0">Self-registration requires a ZJU email for professional or administrator roles, but administrators can assign those roles here without extra email verification. Newly created administrators are approved immediately.</p>
                 </div>
             </div>
 
@@ -253,7 +253,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="admin-note mt-3 mb-0">Leave the password field blank when editing a user if you want to keep the existing password.</p>
+                    <p class="admin-note mt-3 mb-0">Leave the password field blank when editing a user if you want to keep the existing password. Role changes made here can directly promote a user to professional or administrator without extra email verification.</p>
                 </div>
             </div>
         </main>

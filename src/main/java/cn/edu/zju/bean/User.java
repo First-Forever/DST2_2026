@@ -31,13 +31,29 @@ public class User {
 
     public User(int id, String username, String passwordHash, String email, Permission permission, boolean adminApproved,
             Date createdAt) {
+        this(id, username, passwordHash, email, permission, adminApproved, createdAt, true);
+    }
+
+    private User(int id, String username, String passwordHash, String email, Permission permission, boolean adminApproved,
+            Date createdAt, boolean enforcePermissionEmailValidation) {
         this.id = id;
         this.username = username;
         this.passwordHash = passwordHash;
         this.permission = permission == null ? Permission.NORMAL_USER : permission;
-        setEmail(email);
+        validatePermissionEmail(this.permission, email, enforcePermissionEmailValidation);
+        this.email = email;
         this.adminApproved = this.permission == Permission.ADMIN && adminApproved;
         this.createdAt = createdAt;
+    }
+
+    public static User createByAdmin(int id, String username, String passwordHash, String email, Permission permission,
+            boolean adminApproved, Date createdAt) {
+        return new User(id, username, passwordHash, email, permission, adminApproved, createdAt, false);
+    }
+
+    public static User fromPersistence(int id, String username, String passwordHash, String email, Permission permission,
+            boolean adminApproved, Date createdAt) {
+        return new User(id, username, passwordHash, email, permission, adminApproved, createdAt, false);
     }
 
     public int getId() {
@@ -69,7 +85,7 @@ public class User {
     }
 
     public void setEmail(String email) {
-        validatePermissionEmail(permission, email);
+        validatePermissionEmail(permission, email, true);
         this.email = email;
     }
 
@@ -79,7 +95,7 @@ public class User {
 
     public void setPermission(Permission permission) {
         Permission targetPermission = permission == null ? Permission.NORMAL_USER : permission;
-        validatePermissionEmail(targetPermission, email);
+        validatePermissionEmail(targetPermission, email, true);
         this.permission = targetPermission;
         if (targetPermission != Permission.ADMIN) {
             this.adminApproved = false;
@@ -102,7 +118,10 @@ public class User {
         this.createdAt = createdAt;
     }
 
-    private void validatePermissionEmail(Permission permission, String email) {
+    private void validatePermissionEmail(Permission permission, String email, boolean enforcePermissionEmailValidation) {
+        if (!enforcePermissionEmailValidation) {
+            return;
+        }
         if ((permission == Permission.PROFESSIONAL_USER || permission == Permission.ADMIN) && email != null
                 && !isZjuEmail(email)) {
             throw new IllegalArgumentException("Professional users and administrators must use a ZJU email");
