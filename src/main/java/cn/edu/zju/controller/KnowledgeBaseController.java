@@ -3,9 +3,11 @@ package cn.edu.zju.controller;
 import cn.edu.zju.bean.DosingGuideline;
 import cn.edu.zju.bean.Drug;
 import cn.edu.zju.bean.DrugLabel;
+import cn.edu.zju.bean.DrugProfessionalInfo;
 import cn.edu.zju.dao.DosingGuidelineDao;
 import cn.edu.zju.dao.DrugDao;
 import cn.edu.zju.dao.DrugLabelDao;
+import cn.edu.zju.dao.DrugProfessionalInfoDao;
 import cn.edu.zju.servlet.DispatchServlet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +25,13 @@ public class KnowledgeBaseController {
     private DrugDao drugDao = new DrugDao();
     private DrugLabelDao drugLabelDao = new DrugLabelDao();
     private DosingGuidelineDao dosingGuidelineDao = new DosingGuidelineDao();
+    private DrugProfessionalInfoDao drugProfessionalInfoDao = new DrugProfessionalInfoDao();
 
     public void register(DispatchServlet.Dispatcher dispatcher) {
         dispatcher.registerGetMapping("/drugs", this::drugs);
         dispatcher.registerGetMapping("/drugLabels", this::drugLabels);
         dispatcher.registerGetMapping("/dosingGuideline", this::dosingGuideline);
+        dispatcher.registerGetMapping("/drugProfessionalInfo", this::drugProfessionalInfo);
     }
 
     public void drugs(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -64,5 +68,27 @@ public class KnowledgeBaseController {
         }
         request.setAttribute("dosingGuidelines", dosingGuidelines);
         request.getRequestDispatcher("/views/dosing_guideline.jsp").forward(request, response);
+    }
+
+    public void drugProfessionalInfo(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String keyword = trimToNull(request.getParameter("keyword"));
+        String sourceType = trimToNull(request.getParameter("sourceType"));
+        String evidenceLevel = trimToNull(request.getParameter("evidenceLevel"));
+        List<DrugProfessionalInfo> drugProfessionalInfos = drugProfessionalInfoDao.findByFilters(keyword, sourceType, evidenceLevel);
+        request.setAttribute("drugProfessionalInfos", drugProfessionalInfos);
+        request.setAttribute("sourceTypeOptions", drugProfessionalInfoDao.findAllSourceTypes());
+        request.setAttribute("evidenceLevelOptions", drugProfessionalInfoDao.findAllEvidenceLevels());
+        request.setAttribute("selectedKeyword", keyword == null ? "" : keyword);
+        request.setAttribute("selectedSourceType", sourceType == null ? "" : sourceType);
+        request.setAttribute("selectedEvidenceLevel", evidenceLevel == null ? "" : evidenceLevel);
+        request.getRequestDispatcher("/views/drug_professional_info.jsp").forward(request, response);
+    }
+
+    private String trimToNull(String value) {
+        if (value == null) {
+            return null;
+        }
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

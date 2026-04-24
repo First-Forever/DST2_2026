@@ -64,12 +64,46 @@ public class DrugProfessionalInfoDao {
     }
 
     public List<DrugProfessionalInfo> findAll() {
+        return findByFilters(null, null, null);
+    }
+
+    public List<DrugProfessionalInfo> findByKeyword(String keyword) {
+        return findByFilters(keyword, null, null);
+    }
+
+    public List<DrugProfessionalInfo> findByFilters(String keyword, String sourceType, String evidenceLevel) {
         List<DrugProfessionalInfo> drugProfessionalInfos = new ArrayList<>();
         DBUtils.execSQL(connection -> {
             try {
-                PreparedStatement preparedStatement = connection.prepareStatement(
-                        "select id, drug_name, related_genes, source_type, evidence_level, guideline_or_label_tags, literature_summary, pmid_list, source_url from drug_professional_info"
+                List<String> parameters = new ArrayList<>();
+                StringBuilder sql = new StringBuilder(
+                        "select id, drug_name, related_genes, source_type, evidence_level, guideline_or_label_tags, literature_summary, pmid_list, source_url " +
+                                "from drug_professional_info where 1 = 1"
                 );
+
+                if (notBlank(keyword)) {
+                    sql.append(" and (cast(id as char) like ? or drug_name like ? or related_genes like ? or source_type like ? or evidence_level like ? or guideline_or_label_tags like ? or literature_summary like ? or pmid_list like ? or source_url like ?)");
+                    String likeKeyword = "%" + keyword.trim() + "%";
+                    for (int i = 0; i < 9; i++) {
+                        parameters.add(likeKeyword);
+                    }
+                }
+                if (notBlank(sourceType)) {
+                    sql.append(" and source_type = ?");
+                    parameters.add(sourceType.trim());
+                }
+                if (notBlank(evidenceLevel)) {
+                    sql.append(" and evidence_level = ?");
+                    parameters.add(evidenceLevel.trim());
+                }
+
+                sql.append(" order by id");
+
+                PreparedStatement preparedStatement = connection.prepareStatement(sql.toString());
+                for (int i = 0; i < parameters.size(); i++) {
+                    preparedStatement.setString(i + 1, parameters.get(i));
+                }
+
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
                     drugProfessionalInfos.add(buildDrugProfessionalInfo(resultSet));
@@ -81,27 +115,36 @@ public class DrugProfessionalInfoDao {
         return drugProfessionalInfos;
     }
 
-    public List<DrugProfessionalInfo> findByKeyword(String keyword) {
-        List<DrugProfessionalInfo> drugProfessionalInfos = new ArrayList<>();
+    public List<String> findAllSourceTypes() {
+        return findDistinctColumnValues("source_type");
+    }
+
+    public List<String> findAllEvidenceLevels() {
+        return findDistinctColumnValues("evidence_level");
+    }
+
+    private List<String> findDistinctColumnValues(String columnName) {
+        List<String> values = new ArrayList<>();
         DBUtils.execSQL(connection -> {
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(
-                        "select id, drug_name, related_genes, source_type, evidence_level, guideline_or_label_tags, literature_summary, pmid_list, source_url " +
-                                "from drug_professional_info where cast(id as char) like ? or drug_name like ? or related_genes like ? or source_type like ? or evidence_level like ? or guideline_or_label_tags like ? or literature_summary like ? or pmid_list like ? or source_url like ?"
+                        "select distinct " + columnName + " from drug_professional_info " +
+                                "where " + columnName + " is not null and trim(" + columnName + ") <> '' " +
+                                "order by " + columnName
                 );
-                String likeKeyword = "%" + keyword + "%";
-                for (int i = 1; i <= 9; i++) {
-                    preparedStatement.setString(i, likeKeyword);
-                }
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
-                    drugProfessionalInfos.add(buildDrugProfessionalInfo(resultSet));
+                    values.add(resultSet.getString(1));
                 }
             } catch (SQLException e) {
                 log.info("", e);
             }
         });
-        return drugProfessionalInfos;
+        return values;
+    }
+
+    private boolean notBlank(String value) {
+        return value != null && !value.trim().isEmpty();
     }
 
     private DrugProfessionalInfo buildDrugProfessionalInfo(ResultSet resultSet) throws SQLException {

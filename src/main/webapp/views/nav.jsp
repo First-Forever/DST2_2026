@@ -55,6 +55,12 @@
                     Dosing Guideline
                 </a>
             </li>
+            <li class="nav-item">
+                <a class='nav-link ${param.active == "drug_professional_info" ? "active" : ""}' href="<%=request.getContextPath()%>/drugProfessionalInfo">
+                    <span data-feather="file-text"></span>
+                    Drug Professional Info
+                </a>
+            </li>
         </ul>
     </div>
 </nav>
