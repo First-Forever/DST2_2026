@@ -29,6 +29,7 @@ public class AdminController {
         dispatcher.registerPostMapping("/admin/users/update", this::updateUser);
         dispatcher.registerPostMapping("/admin/users/delete", this::deleteUser);
         dispatcher.registerPostMapping("/admin/users/approve", this::approveAdminApplication);
+        dispatcher.registerPostMapping("/admin/users/reject", this::rejectPermissionApplication);
     }
 
     public void userManagement(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -64,15 +65,15 @@ public class AdminController {
 
         try {
             Permission permission = permissionValue.isEmpty() ? Permission.NORMAL_USER : Permission.valueOf(permissionValue);
-            boolean adminApproved = permission == Permission.ADMIN;
+            boolean adminApproved = requiresApproval(permission);
             User user = User.createByAdmin(0, username, hashPassword(password), email, permission, adminApproved, new Date());
             int id = userDao.save(user);
             if (id == 0) {
                 redirectToUserManagement(response, request, null, "Failed to create user.");
                 return;
             }
-            String successMessage = permission == Permission.ADMIN
-                    ? "Administrator created and approved."
+            String successMessage = requiresApproval(permission)
+                    ? describePermission(permission) + " created and approved."
                     : "User created successfully.";
             redirectToUserManagement(response, request, successMessage, null);
         } catch (IllegalArgumentException e) {
@@ -119,7 +120,7 @@ public class AdminController {
         try {
             Permission permission = permissionValue.isEmpty() ? existingUser.getPermission() : Permission.valueOf(permissionValue);
             String passwordHash = password.isEmpty() ? existingUser.getPasswordHash() : hashPassword(password);
-            boolean adminApproved = permission == Permission.ADMIN;
+            boolean adminApproved = requiresApproval(permission);
             User updatedUser = User.createByAdmin(id, username, passwordHash, email, permission, adminApproved,
                     existingUser.getCreatedAt());
             if (!userDao.update(updatedUser)) {
@@ -170,16 +171,51 @@ public class AdminController {
             redirectToUserManagement(response, request, null, "Invalid user id.");
             return;
         }
-        if (!userDao.approveAdmin(id)) {
-            redirectToUserManagement(response, request, null, "Failed to approve administrator application.");
+
+        User application = userDao.findById(id);
+        if (application == null || !application.isRoleApplicationPending()) {
+            redirectToUserManagement(response, request, null, "Pending permission application not found.");
             return;
         }
-        redirectToUserManagement(response, request, "Administrator application approved.", null);
+
+        Permission requestedPermission = application.getPermission();
+        if (!userDao.approvePermissionApplication(id)) {
+            redirectToUserManagement(response, request, null, "Failed to approve permission application.");
+            return;
+        }
+        redirectToUserManagement(response, request, describePermission(requestedPermission) + " application approved.", null);
+    }
+
+    public void rejectPermissionApplication(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        if (!requireAdmin(request, response)) {
+            return;
+        }
+
+        Integer id = parseId(request.getParameter("id"));
+        if (id == null) {
+            redirectToUserManagement(response, request, null, "Invalid user id.");
+            return;
+        }
+
+        User application = userDao.findById(id);
+        if (application == null || !application.isRoleApplicationPending()) {
+            redirectToUserManagement(response, request, null, "Pending permission application not found.");
+            return;
+        }
+
+        Permission requestedPermission = application.getPermission();
+        if (!userDao.rejectPermissionApplication(id)) {
+            redirectToUserManagement(response, request, null, "Failed to reject permission application.");
+            return;
+        }
+        redirectToUserManagement(response, request,
+                describePermission(requestedPermission) + " application rejected. The account remains a normal user.",
+                null);
     }
 
     private void loadUserManagementPage(HttpServletRequest request) {
         request.setAttribute("users", userDao.findAll());
-        request.setAttribute("pendingAdmins", userDao.findPendingAdmins());
+        request.setAttribute("pendingApplications", userDao.findPendingPermissionApplications());
         request.setAttribute("permissionOptions", Permission.values());
         request.setAttribute("successMessage", trimToNull(request.getParameter("successMessage")));
         request.setAttribute("errorMessage", trimToNull(request.getParameter("errorMessage")));
@@ -213,11 +249,25 @@ public class AdminController {
 
     private boolean requireAdmin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         User currentUser = getCurrentUser(request);
-        if (currentUser == null || currentUser.getPermission() != Permission.ADMIN) {
+        if (currentUser == null || currentUser.getPermission() != Permission.ADMIN || !currentUser.isAdminApproved()) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Administrators only.");
             return false;
         }
         return true;
+    }
+
+    private boolean requiresApproval(Permission permission) {
+        return permission == Permission.PROFESSIONAL_USER || permission == Permission.ADMIN;
+    }
+
+    private String describePermission(Permission permission) {
+        if (permission == Permission.ADMIN) {
+            return "Administrator";
+        }
+        if (permission == Permission.PROFESSIONAL_USER) {
+            return "Professional user";
+        }
+        return "User";
     }
 
     private User getCurrentUser(HttpServletRequest request) {

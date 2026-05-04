@@ -80,7 +80,7 @@
             <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
                 <div>
                     <h2 class="mb-1">User Management</h2>
-                    <p class="admin-subtitle">Approve administrator applications and manage system users.</p>
+                    <p class="admin-subtitle">Approve professional user and administrator applications, and manage system users.</p>
                 </div>
             </div>
 
@@ -124,19 +124,19 @@
                             </div>
                         </div>
                     </form>
-                    <p class="admin-note mb-0">Self-registration requires a ZJU email for professional or administrator roles, but administrators can assign those roles here without extra email verification. Newly created administrators are approved immediately.</p>
+                    <p class="admin-note mb-0">Self-registered professional users with a ZJU email are approved automatically. Professional users with other emails and later administrator applications need approval. Accounts created here are approved immediately when assigned a professional or administrator role.</p>
                 </div>
             </div>
 
             <div class="card admin-card">
                 <div class="card-header">
-                    <h5 class="mb-1">Pending Administrator Applications</h5>
-                    <p class="admin-subtitle">Review users who requested administrator permission during registration.</p>
+                    <h5 class="mb-1">Pending Permission Applications</h5>
+                    <p class="admin-subtitle">Review non-ZJU professional user applications and administrator applications from registration.</p>
                 </div>
                 <div class="card-body">
                     <c:choose>
-                        <c:when test="${empty pendingAdmins}">
-                            <p class="text-muted mb-0">No pending administrator applications.</p>
+                        <c:when test="${empty pendingApplications}">
+                            <p class="text-muted mb-0">No pending professional user or administrator applications.</p>
                         </c:when>
                         <c:otherwise>
                             <div class="table-responsive">
@@ -146,22 +146,30 @@
                                         <th>ID</th>
                                         <th>Username</th>
                                         <th>Email</th>
+                                        <th>Requested Permission</th>
                                         <th>Created At</th>
                                         <th>Action</th>
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    <c:forEach items="${pendingAdmins}" var="user">
+                                    <c:forEach items="${pendingApplications}" var="user">
                                         <tr>
                                             <td>${user.id}</td>
                                             <td>${user.username}</td>
                                             <td>${user.email}</td>
+                                            <td>${user.permissionLabel}</td>
                                             <td>${user.createdAt}</td>
                                             <td>
-                                                <form method="post" action="<%=request.getContextPath()%>/admin/users/approve" class="mb-0">
-                                                    <input type="hidden" name="id" value="${user.id}">
-                                                    <button type="submit" class="btn btn-sm btn-success">Approve</button>
-                                                </form>
+                                                <div class="d-flex">
+                                                    <form method="post" action="<%=request.getContextPath()%>/admin/users/approve" class="mb-0 mr-2">
+                                                        <input type="hidden" name="id" value="${user.id}">
+                                                        <button type="submit" class="btn btn-sm btn-success">Approve</button>
+                                                    </form>
+                                                    <form method="post" action="<%=request.getContextPath()%>/admin/users/reject" class="mb-0" onsubmit="return confirm('Reject this permission application? The account will remain a normal user.');">
+                                                        <input type="hidden" name="id" value="${user.id}">
+                                                        <button type="submit" class="btn btn-sm btn-outline-secondary">Reject</button>
+                                                    </form>
+                                                </div>
                                             </td>
                                         </tr>
                                     </c:forEach>
@@ -187,7 +195,7 @@
                                 <th>Username</th>
                                 <th>Email</th>
                                 <th>User Type</th>
-                                <th>Admin Approved</th>
+                                <th>Approval Status</th>
                                 <th>Created At</th>
                                 <th style="min-width: 460px;">Edit</th>
                                 <th>Delete</th>
@@ -199,8 +207,20 @@
                                     <td>${user.id}</td>
                                     <td>${user.username}</td>
                                     <td>${user.email}</td>
-                                    <td>${user.permission}</td>
-                                    <td>${user.adminApproved}</td>
+                                    <td>${user.permissionLabel}</td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${not user.elevatedPermission}">
+                                                <span class="badge badge-secondary">${user.approvalStatusLabel}</span>
+                                            </c:when>
+                                            <c:when test="${user.permissionApproved}">
+                                                <span class="badge badge-success">${user.approvalStatusLabel}</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge badge-warning">${user.approvalStatusLabel}</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </td>
                                     <td>${user.createdAt}</td>
                                     <td>
                                         <form method="post" action="<%=request.getContextPath()%>/admin/users/update" class="compact-form">
@@ -253,7 +273,7 @@
                             </tbody>
                         </table>
                     </div>
-                    <p class="admin-note mt-3 mb-0">Leave the password field blank when editing a user if you want to keep the existing password. Role changes made here can directly promote a user to professional or administrator without extra email verification.</p>
+                    <p class="admin-note mt-3 mb-0">Leave the password field blank when editing a user if you want to keep the existing password. Role changes made here directly approve professional or administrator permission.</p>
                 </div>
             </div>
         </main>

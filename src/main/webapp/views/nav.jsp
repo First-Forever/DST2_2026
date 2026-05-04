@@ -11,9 +11,12 @@
 <%
     User currentUser = (User) session.getAttribute("currentUser");
     boolean canAccessProfessionalInfo = currentUser != null
+            && currentUser.isPermissionApproved()
             && (currentUser.getPermission() == User.Permission.PROFESSIONAL_USER
             || currentUser.getPermission() == User.Permission.ADMIN);
-    boolean isAdmin = currentUser != null && currentUser.getPermission() == User.Permission.ADMIN;
+    boolean isAdmin = currentUser != null
+            && currentUser.getPermission() == User.Permission.ADMIN
+            && currentUser.isAdminApproved();
 %>
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">

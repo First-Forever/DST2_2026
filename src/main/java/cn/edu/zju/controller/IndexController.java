@@ -58,8 +58,9 @@ public class IndexController {
             request.getRequestDispatcher("/views/welcome.jsp").forward(request, response);
             return;
         }
-        if (user.getPermission() == Permission.ADMIN && !user.isAdminApproved()) {
-            request.setAttribute("errorMessage", "Administrator permission is waiting for approval.");
+        if (requiresApproval(user.getPermission()) && !user.isAdminApproved()) {
+            request.setAttribute("errorMessage",
+                    describePermission(user.getPermission()) + " permission is waiting for approval.");
             request.getRequestDispatcher("/views/welcome.jsp").forward(request, response);
             return;
         }
@@ -94,7 +95,9 @@ public class IndexController {
         try {
             Permission permission = permissionValue.isEmpty() ? Permission.NORMAL_USER : Permission.valueOf(permissionValue);
             boolean bootstrapAdmin = permission == Permission.ADMIN && !userDao.hasApprovedAdmin();
-            User user = new User(0, username, hashPassword(password), email, permission, false, new Date());
+            boolean approvedOnRegistration = permission == Permission.PROFESSIONAL_USER && User.isZjuEmail(email);
+            User user = new User(0, username, hashPassword(password), email, permission, approvedOnRegistration,
+                    new Date());
             int id = userDao.save(user);
             if (id == 0) {
                 request.setAttribute("errorMessage", "Registration failed. Please try again.");
@@ -104,8 +107,13 @@ public class IndexController {
             if (bootstrapAdmin) {
                 userDao.approveAdmin(id);
                 request.setAttribute("successMessage", "Initial administrator registered and approved. Please sign in.");
-            } else if (permission == Permission.ADMIN) {
-                request.setAttribute("successMessage", "Registration successful. Administrator permission is waiting for approval.");
+            } else if (permission == Permission.PROFESSIONAL_USER && approvedOnRegistration) {
+                request.setAttribute("successMessage",
+                        "Registration successful. Professional user permission approved. Please sign in.");
+            } else if (requiresApproval(permission)) {
+                request.setAttribute("successMessage",
+                        "Registration successful. " + describePermission(permission)
+                                + " permission is waiting for approval.");
             } else {
                 request.setAttribute("successMessage", "Registration successful. Please sign in.");
             }
@@ -118,6 +126,20 @@ public class IndexController {
 
     private String trimToEmpty(String value) {
         return value == null ? "" : value.trim();
+    }
+
+    private boolean requiresApproval(Permission permission) {
+        return permission == Permission.PROFESSIONAL_USER || permission == Permission.ADMIN;
+    }
+
+    private String describePermission(Permission permission) {
+        if (permission == Permission.ADMIN) {
+            return "Administrator";
+        }
+        if (permission == Permission.PROFESSIONAL_USER) {
+            return "Professional user";
+        }
+        return "User";
     }
 
     private String hashPassword(String password) {

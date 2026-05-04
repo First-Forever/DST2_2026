@@ -140,9 +140,32 @@ public class UserDao extends BaseDao {
         DBUtils.execSQL(connection -> {
             try {
                 PreparedStatement preparedStatement = connection.prepareStatement(
-                        "select id, username, password_hash, email, permission, admin_approved, created_at from app_user where permission = ? and admin_approved = ?");
+                        "select id, username, password_hash, email, permission, admin_approved, created_at " +
+                                "from app_user where permission = ? and admin_approved = ? order by created_at desc, id desc");
                 preparedStatement.setString(1, Permission.ADMIN.name());
                 preparedStatement.setBoolean(2, false);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                while (resultSet.next()) {
+                    users.add(mapUser(resultSet));
+                }
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return users;
+    }
+
+    public List<User> findPendingPermissionApplications() {
+        List<User> users = new ArrayList<>();
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        "select id, username, password_hash, email, permission, admin_approved, created_at " +
+                                "from app_user where permission in (?, ?) and admin_approved = ? " +
+                                "order by created_at desc, id desc");
+                preparedStatement.setString(1, Permission.PROFESSIONAL_USER.name());
+                preparedStatement.setString(2, Permission.ADMIN.name());
+                preparedStatement.setBoolean(3, false);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 while (resultSet.next()) {
                     users.add(mapUser(resultSet));
@@ -182,6 +205,45 @@ public class UserDao extends BaseDao {
                 preparedStatement.setBoolean(1, true);
                 preparedStatement.setInt(2, id);
                 preparedStatement.setString(3, Permission.ADMIN.name());
+                updated.set(preparedStatement.executeUpdate() > 0);
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return updated.get();
+    }
+
+    public boolean approvePermissionApplication(int id) {
+        AtomicBoolean updated = new AtomicBoolean(false);
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        "update app_user set admin_approved = ? where id = ? and permission in (?, ?) and admin_approved = ?");
+                preparedStatement.setBoolean(1, true);
+                preparedStatement.setInt(2, id);
+                preparedStatement.setString(3, Permission.PROFESSIONAL_USER.name());
+                preparedStatement.setString(4, Permission.ADMIN.name());
+                preparedStatement.setBoolean(5, false);
+                updated.set(preparedStatement.executeUpdate() > 0);
+            } catch (SQLException e) {
+                log.info("", e);
+            }
+        });
+        return updated.get();
+    }
+
+    public boolean rejectPermissionApplication(int id) {
+        AtomicBoolean updated = new AtomicBoolean(false);
+        DBUtils.execSQL(connection -> {
+            try {
+                PreparedStatement preparedStatement = connection.prepareStatement(
+                        "update app_user set permission = ?, admin_approved = ? where id = ? and permission in (?, ?) and admin_approved = ?");
+                preparedStatement.setString(1, Permission.NORMAL_USER.name());
+                preparedStatement.setBoolean(2, false);
+                preparedStatement.setInt(3, id);
+                preparedStatement.setString(4, Permission.PROFESSIONAL_USER.name());
+                preparedStatement.setString(5, Permission.ADMIN.name());
+                preparedStatement.setBoolean(6, false);
                 updated.set(preparedStatement.executeUpdate() > 0);
             } catch (SQLException e) {
                 log.info("", e);

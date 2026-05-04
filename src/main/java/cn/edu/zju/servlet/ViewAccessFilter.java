@@ -46,7 +46,8 @@ public class ViewAccessFilter implements Filter {
             return;
         }
 
-        if (ADMIN_ONLY_VIEWS.contains(viewPath) && currentUser.getPermission() != User.Permission.ADMIN) {
+        if (ADMIN_ONLY_VIEWS.contains(viewPath)
+                && (currentUser.getPermission() != User.Permission.ADMIN || !currentUser.isAdminApproved())) {
             httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Administrators only.");
             return;
         }
@@ -73,7 +74,8 @@ public class ViewAccessFilter implements Filter {
     }
 
     private boolean hasProfessionalAccess(User user) {
-        return user.getPermission() == User.Permission.PROFESSIONAL_USER
-                || user.getPermission() == User.Permission.ADMIN;
+        return user.isPermissionApproved()
+                && (user.getPermission() == User.Permission.PROFESSIONAL_USER
+                || user.getPermission() == User.Permission.ADMIN);
     }
 }

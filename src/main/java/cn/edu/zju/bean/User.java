@@ -42,7 +42,7 @@ public class User {
         this.permission = permission == null ? Permission.NORMAL_USER : permission;
         validatePermissionEmail(this.permission, email, enforcePermissionEmailValidation);
         this.email = email;
-        this.adminApproved = this.permission == Permission.ADMIN && adminApproved;
+        this.adminApproved = requiresApproval(this.permission) && adminApproved;
         this.createdAt = createdAt;
     }
 
@@ -97,7 +97,7 @@ public class User {
         Permission targetPermission = permission == null ? Permission.NORMAL_USER : permission;
         validatePermissionEmail(targetPermission, email, true);
         this.permission = targetPermission;
-        if (targetPermission != Permission.ADMIN) {
+        if (!requiresApproval(targetPermission)) {
             this.adminApproved = false;
         }
     }
@@ -107,7 +107,38 @@ public class User {
     }
 
     public void setAdminApproved(boolean adminApproved) {
-        this.adminApproved = permission == Permission.ADMIN && adminApproved;
+        this.adminApproved = requiresApproval(permission) && adminApproved;
+    }
+
+    public boolean isElevatedPermission() {
+        return requiresApproval(permission);
+    }
+
+    public boolean isPermissionApproved() {
+        return !requiresApproval(permission) || adminApproved;
+    }
+
+    public boolean isRoleApplicationPending() {
+        return requiresApproval(permission) && !adminApproved;
+    }
+
+    public String getPermissionLabel() {
+        switch (permission) {
+            case PROFESSIONAL_USER:
+                return "Professional user";
+            case ADMIN:
+                return "Administrator";
+            case NORMAL_USER:
+            default:
+                return "Normal user";
+        }
+    }
+
+    public String getApprovalStatusLabel() {
+        if (!requiresApproval(permission)) {
+            return "Not required";
+        }
+        return adminApproved ? "Approved" : "Pending approval";
     }
 
     public Date getCreatedAt() {
@@ -122,13 +153,26 @@ public class User {
         if (!enforcePermissionEmailValidation) {
             return;
         }
-        if ((permission == Permission.PROFESSIONAL_USER || permission == Permission.ADMIN) && email != null
+        if (permission == Permission.ADMIN && email != null
                 && !isZjuEmail(email)) {
-            throw new IllegalArgumentException("Professional users and administrators must use a ZJU email");
+            throw new IllegalArgumentException("Administrators must use a ZJU email");
         }
     }
 
-    private boolean isZjuEmail(String email) {
-        return email.trim().toLowerCase(Locale.ROOT).endsWith("zju.edu.cn");
+    private static boolean requiresApproval(Permission permission) {
+        return permission == Permission.PROFESSIONAL_USER || permission == Permission.ADMIN;
+    }
+
+    public static boolean isZjuEmail(String email) {
+        if (email == null) {
+            return false;
+        }
+        String normalizedEmail = email.trim().toLowerCase(Locale.ROOT);
+        int atIndex = normalizedEmail.lastIndexOf('@');
+        if (atIndex < 0 || atIndex == normalizedEmail.length() - 1) {
+            return false;
+        }
+        String domain = normalizedEmail.substring(atIndex + 1);
+        return "zju.edu.cn".equals(domain) || domain.endsWith(".zju.edu.cn");
     }
 }

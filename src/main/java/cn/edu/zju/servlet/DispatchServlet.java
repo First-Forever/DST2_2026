@@ -136,7 +136,8 @@ public class DispatchServlet extends HttpServlet {
     }
 
     private boolean hasProfessionalAccess(User user) {
-        return user.getPermission() == User.Permission.PROFESSIONAL_USER
-                || user.getPermission() == User.Permission.ADMIN;
+        return user.isPermissionApproved()
+                && (user.getPermission() == User.Permission.PROFESSIONAL_USER
+                || user.getPermission() == User.Permission.ADMIN);
     }
 }
