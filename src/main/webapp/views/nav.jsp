@@ -39,6 +39,12 @@
                     Samples
                 </a>
             </li>
+            <li class="nav-item">
+                <a class='nav-link ${param.active == "assistant" ? "active" : ""}' href="<%=request.getContextPath()%>/assistant">
+                    <span data-feather="message-circle"></span>
+                    AI Assistant
+                </a>
+            </li>
             <% if (isAdmin) { %>
             <li class="nav-item">
                 <a class='nav-link ${param.active == "admin_users" ? "active" : ""}' href="<%=request.getContextPath()%>/admin/users">
