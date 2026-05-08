@@ -168,12 +168,25 @@ public class KnowledgeBaseController {
     private String resolveReturnUrl(HttpServletRequest request) {
         String returnUrl = request.getParameter("returnUrl");
         String contextPath = request.getContextPath();
-        if (returnUrl != null
-                && returnUrl.startsWith(contextPath + "/")
-                && !returnUrl.startsWith(contextPath + "//")) {
+        if (isAllowedReturnUrl(returnUrl, contextPath)) {
             return returnUrl;
         }
         return contextPath + "/drugs";
+    }
+
+    private boolean isAllowedReturnUrl(String returnUrl, String contextPath) {
+        if (returnUrl == null || !returnUrl.startsWith(contextPath + "/") || returnUrl.startsWith(contextPath + "//")) {
+            return false;
+        }
+        String path = returnUrl.substring(contextPath.length());
+        int queryIndex = path.indexOf('?');
+        if (queryIndex >= 0) {
+            path = path.substring(0, queryIndex);
+        }
+        return "/drugs".equals(path)
+                || "/drugLabels".equals(path)
+                || "/dosingGuideline".equals(path)
+                || "/drugProfessionalInfo".equals(path);
     }
 
     private String normalizeDrugName(String drugName) {

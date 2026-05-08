@@ -43,6 +43,46 @@
                 font-size: 3.5rem;
             }
         }
+
+        .favorite-inline-form {
+            display: block;
+            margin: 0;
+            text-align: center;
+        }
+
+        .favorite-column {
+            text-align: center;
+            width: 2.25rem;
+        }
+
+        .favorite-heart {
+            border: 0;
+            background: transparent;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: .95rem;
+            line-height: 1;
+            padding: 0 .1rem;
+            vertical-align: middle;
+        }
+
+        .favorite-heart.is-favorited {
+            color: #dc3545;
+        }
+
+        .favorite-heart:focus {
+            outline: 1px dotted #495057;
+            outline-offset: 2px;
+        }
+
+        table.dataTable thead .favorite-column.sorting:before,
+        table.dataTable thead .favorite-column.sorting:after,
+        table.dataTable thead .favorite-column.sorting_asc:before,
+        table.dataTable thead .favorite-column.sorting_asc:after,
+        table.dataTable thead .favorite-column.sorting_desc:before,
+        table.dataTable thead .favorite-column.sorting_desc:after {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -88,30 +128,42 @@
                 <table class="table table-striped table-sm" id="dosingGuidelinesTable">
                     <thead>
                     <tr>
+                        <th class="favorite-column"></th>
                         <th>#</th>
                         <th>Name</th>
                         <th>Recommendation</th>
                         <th>Drug Id</th>
                         <th>Source</th>
                         <th>Summary Markdown</th>
-                        <th>Favorite</th>
                     </tr>
                     </thead>
                     <tbody>
                     <c:forEach items="${dosingGuidelines}" var="item">
                         <tr>
+                            <td class="favorite-column">
+                                <c:if test="${not empty item.drugId}">
+                                    <form action="<%=request.getContextPath()%>/drugFavorite" method="post" class="favorite-inline-form">
+                                        <input type="hidden" name="drugId" value="${item.drugId}">
+                                        <input type="hidden" name="returnUrl" value="<%=request.getContextPath()%>/dosingGuideline<%=request.getQueryString() == null ? "" : "?" + request.getQueryString()%>">
+                                        <c:choose>
+                                            <c:when test="${item.favorited}">
+                                                <input type="hidden" name="action" value="remove">
+                                                <button type="submit" class="favorite-heart is-favorited" title="Remove collection" aria-label="Remove collection ${item.name}">&#9829;</button>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <input type="hidden" name="action" value="add">
+                                                <button type="submit" class="favorite-heart" title="Collect" aria-label="Collect ${item.name}">&#9825;</button>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </form>
+                                </c:if>
+                            </td>
                             <td>${item.id}</td>
                             <td>${item.name}</td>
                             <td>${item.recommendation}</td>
                             <td>${item.drugId}</td>
                             <td>${item.source}</td>
                             <td>${item.summaryMarkdown}</td>
-                            <td>
-                                <c:choose>
-                                    <c:when test="${item.favorited}">Favorited</c:when>
-                                    <c:otherwise>Not favorited</c:otherwise>
-                                </c:choose>
-                            </td>
                         </tr>
                     </c:forEach>
 
@@ -127,13 +179,17 @@
         $('#dosingGuidelinesTable').DataTable({
             searching: false,
             paging: false,
-            info: false
+            info: false,
+            order: [],
+            columnDefs: [
+                { targets: 0, orderable: false, searchable: false }
+            ]
         });
         const recSet = new Set();
         const srcSet = new Set();
         $('#dosingGuidelinesTable tbody tr').each(function() {
-            recSet.add($(this).find('td').eq(2).text().trim());
-            srcSet.add($(this).find('td').eq(4).text().trim());
+            recSet.add($(this).find('td').eq(3).text().trim());
+            srcSet.add($(this).find('td').eq(5).text().trim());
         });
         recSet.forEach(val => $('#recommendationFilter').append('<option value="' + val + '">' + val + '</option>'));
         srcSet.forEach(val => $('#sourceFilter').append('<option value="' + val + '">' + val + '</option>'));
@@ -144,8 +200,8 @@
         const rows = document.querySelectorAll("#dosingGuidelinesTable tbody tr");
 
         rows.forEach(row => {
-            const recCell = row.cells[2].innerText.trim();
-            const srcCell = row.cells[4].innerText.trim();
+            const recCell = row.cells[3].innerText.trim();
+            const srcCell = row.cells[5].innerText.trim();
             const recMatch = recSelected === "" || recCell === recSelected;
             const srcMatch = srcSelected === "" || srcCell === srcSelected;
             if (recMatch && srcMatch) {

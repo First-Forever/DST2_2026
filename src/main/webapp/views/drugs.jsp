@@ -45,8 +45,14 @@
         }
 
         .favorite-inline-form {
-            display: inline-block;
-            margin: 0 .35rem 0 0;
+            display: block;
+            margin: 0;
+            text-align: center;
+        }
+
+        .favorite-column {
+            text-align: center;
+            width: 2.25rem;
         }
 
         .favorite-heart {
@@ -67,6 +73,15 @@
         .favorite-heart:focus {
             outline: 1px dotted #495057;
             outline-offset: 2px;
+        }
+
+        table.dataTable thead .favorite-column.sorting:before,
+        table.dataTable thead .favorite-column.sorting:after,
+        table.dataTable thead .favorite-column.sorting_asc:before,
+        table.dataTable thead .favorite-column.sorting_asc:after,
+        table.dataTable thead .favorite-column.sorting_desc:before,
+        table.dataTable thead .favorite-column.sorting_desc:after {
+            display: none;
         }
     </style>
 </head>
@@ -107,6 +122,7 @@
                 <table class="table table-striped table-sm" id="drugsTable">
                     <thead>
                     <tr>
+                        <th class="favorite-column"></th>
                         <th>#</th>
                         <th>Name</th>
                         <th>Drug Url</th>
@@ -116,23 +132,23 @@
                     <tbody>
                     <c:forEach items="${drugs}" var="item">
                         <tr>
-                            <td>
+                            <td class="favorite-column">
                                 <form action="<%=request.getContextPath()%>/drugFavorite" method="post" class="favorite-inline-form">
                                     <input type="hidden" name="drugId" value="${item.id}">
-                                    <input type="hidden" name="returnUrl" value="<%=request.getRequestURI() + (request.getQueryString() == null ? "" : "?" + request.getQueryString())%>">
+                                    <input type="hidden" name="returnUrl" value="<%=request.getContextPath()%>/drugs<%=request.getQueryString() == null ? "" : "?" + request.getQueryString()%>">
                                     <c:choose>
                                         <c:when test="${item.favorited}">
                                             <input type="hidden" name="action" value="remove">
-                                            <button type="submit" class="favorite-heart is-favorited" title="Unfavorite" aria-label="Unfavorite ${item.name}">&#9829;</button>
+                                            <button type="submit" class="favorite-heart is-favorited" title="Remove collection" aria-label="Remove collection ${item.name}">&#9829;</button>
                                         </c:when>
                                         <c:otherwise>
                                             <input type="hidden" name="action" value="add">
-                                            <button type="submit" class="favorite-heart" title="Favorite" aria-label="Favorite ${item.name}">&#9825;</button>
+                                            <button type="submit" class="favorite-heart" title="Collect" aria-label="Collect ${item.name}">&#9825;</button>
                                         </c:otherwise>
                                     </c:choose>
                                 </form>
-                                ${item.id}
                             </td>
+                            <td>${item.id}</td>
                             <td>${item.name}</td>
                             <td>${item.drugUrl}</td>
                             <td>${item.biomarker}</td>
@@ -151,11 +167,15 @@
         $('#drugsTable').DataTable({
             searching: false,
             paging: false,
-            info: false
+            info: false,
+            order: [],
+            columnDefs: [
+                { targets: 0, orderable: false, searchable: false }
+            ]
         });
         const bioSet = new Set();
         $('#drugsTable tbody tr').each(function() {
-            bioSet.add($(this).find('td').eq(3).text().trim());
+            bioSet.add($(this).find('td').eq(4).text().trim());
         });
         bioSet.forEach(val => $('#biomarkerFilter').append('<option value="' + val + '">' + val + '</option>'));
     });
@@ -164,7 +184,7 @@
         const rows = document.querySelectorAll("#drugsTable tbody tr");
 
         rows.forEach(row => {
-            const biomarkerCell = row.cells[3].innerText.trim();
+            const biomarkerCell = row.cells[4].innerText.trim();
             if (selected === "" || biomarkerCell === selected) {
                 row.style.display = "";
             } else {

@@ -134,7 +134,6 @@
                     <thead>
                     <tr>
                         <th>#</th>
-                        <th>Drug Id</th>
                         <th>Drug Name</th>
                         <th>Related Genes</th>
                         <th>Source Type</th>
@@ -149,25 +148,6 @@
                     <c:forEach items="${drugProfessionalInfos}" var="item">
                         <tr>
                             <td>${item.id}</td>
-                            <td>
-                                <c:if test="${not empty item.drugId}">
-                                    <form action="<%=request.getContextPath()%>/drugFavorite" method="post" class="favorite-inline-form">
-                                        <input type="hidden" name="drugId" value="${item.drugId}">
-                                        <input type="hidden" name="returnUrl" value="<%=request.getRequestURI() + (request.getQueryString() == null ? "" : "?" + request.getQueryString())%>">
-                                        <c:choose>
-                                            <c:when test="${item.favorited}">
-                                                <input type="hidden" name="action" value="remove">
-                                                <button type="submit" class="favorite-heart is-favorited" title="Unfavorite" aria-label="Unfavorite ${item.drugName}">&#9829;</button>
-                                            </c:when>
-                                            <c:otherwise>
-                                                <input type="hidden" name="action" value="add">
-                                                <button type="submit" class="favorite-heart" title="Favorite" aria-label="Favorite ${item.drugName}">&#9825;</button>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </form>
-                                </c:if>
-                                ${item.drugId}
-                            </td>
                             <td>${item.drugName}</td>
                             <td>${item.relatedGenes}</td>
                             <td>${item.sourceType}</td>
