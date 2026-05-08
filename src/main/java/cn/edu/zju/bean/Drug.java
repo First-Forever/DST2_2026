@@ -7,6 +7,7 @@ public class Drug {
     private boolean biomarker;
     private String drugUrl;
     private String ObjCls;
+    private boolean favorited;
 
     public Drug() {
     }
@@ -57,6 +58,14 @@ public class Drug {
 
     public void setObjCls(String objCls) {
         ObjCls = objCls;
+    }
+
+    public boolean isFavorited() {
+        return favorited;
+    }
+
+    public void setFavorited(boolean favorited) {
+        this.favorited = favorited;
     }
 
 }

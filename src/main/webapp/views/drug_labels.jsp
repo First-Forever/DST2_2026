@@ -95,6 +95,8 @@
                         <th>Efficacy Summary</th>
                         <th>Response Warning</th>
                         <th>Alternative Drug</th>
+                        <th>Drug Id</th>
+                        <th>Favorite</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -107,6 +109,13 @@
                             <td>${item.efficacySummary}</td>
                             <td>${item.responseWarning}</td>
                             <td>${item.alternativeDrug}</td>
+                            <td>${item.drugId}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${item.favorited}">Favorited</c:when>
+                                    <c:otherwise>Not favorited</c:otherwise>
+                                </c:choose>
+                            </td>
                         </tr>
                     </c:forEach>
 

@@ -94,6 +94,7 @@
                         <th>Drug Id</th>
                         <th>Source</th>
                         <th>Summary Markdown</th>
+                        <th>Favorite</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -105,6 +106,12 @@
                             <td>${item.drugId}</td>
                             <td>${item.source}</td>
                             <td>${item.summaryMarkdown}</td>
+                            <td>
+                                <c:choose>
+                                    <c:when test="${item.favorited}">Favorited</c:when>
+                                    <c:otherwise>Not favorited</c:otherwise>
+                                </c:choose>
+                            </td>
                         </tr>
                     </c:forEach>
 

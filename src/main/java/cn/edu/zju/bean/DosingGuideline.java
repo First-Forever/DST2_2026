@@ -26,6 +26,7 @@ public class DosingGuideline {
     private String summaryMarkdown;
     private String textMarkdown;
     private String raw;
+    private boolean favorited;
 
     public String getRaw() {
         return raw;
@@ -81,6 +82,14 @@ public class DosingGuideline {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public boolean isFavorited() {
+        return favorited;
+    }
+
+    public void setFavorited(boolean favorited) {
+        this.favorited = favorited;
     }
 
     public String getSummaryMarkdown() {

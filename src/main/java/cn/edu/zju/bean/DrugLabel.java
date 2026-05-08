@@ -16,6 +16,7 @@ public class DrugLabel {
     private String alternativeDrug;
     private String raw;
     private String drugId;
+    private boolean favorited;
 
     public DrugLabel() {
     }
@@ -67,6 +68,14 @@ public class DrugLabel {
 
     public void setDrugId(String drugId) {
         this.drugId = drugId;
+    }
+
+    public boolean isFavorited() {
+        return favorited;
+    }
+
+    public void setFavorited(boolean favorited) {
+        this.favorited = favorited;
     }
 
     public String getRaw() {

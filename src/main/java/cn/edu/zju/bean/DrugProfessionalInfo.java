@@ -4,6 +4,7 @@ public class DrugProfessionalInfo {
 
     private Long id;
     private String drugName;
+    private String drugId;
     private String relatedGenes;
     private String sourceType;
     private String evidenceLevel;
@@ -11,6 +12,7 @@ public class DrugProfessionalInfo {
     private String literatureSummary;
     private String pmidList;
     private String sourceUrl;
+    private boolean favorited;
 
     public DrugProfessionalInfo() {
     }
@@ -47,6 +49,14 @@ public class DrugProfessionalInfo {
 
     public void setDrugName(String drugName) {
         this.drugName = drugName;
+    }
+
+    public String getDrugId() {
+        return drugId;
+    }
+
+    public void setDrugId(String drugId) {
+        this.drugId = drugId;
     }
 
     public String getRelatedGenes() {
@@ -103,5 +113,13 @@ public class DrugProfessionalInfo {
 
     public void setSourceUrl(String sourceUrl) {
         this.sourceUrl = sourceUrl;
+    }
+
+    public boolean isFavorited() {
+        return favorited;
+    }
+
+    public void setFavorited(boolean favorited) {
+        this.favorited = favorited;
     }
 }

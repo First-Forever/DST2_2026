@@ -258,3 +258,19 @@ create table app_user
         unique (email)
 );
 
+create table drug_favorite
+(
+    user_id int not null,
+    drug_id varchar(100) not null,
+    created_at datetime not null default current_timestamp,
+    primary key (user_id, drug_id),
+    constraint drug_favorite_user_fk
+        foreign key (user_id) references app_user (id)
+            on delete cascade,
+    constraint drug_favorite_drug_fk
+        foreign key (drug_id) references drug (id)
+            on delete cascade
+);
+
+create index drug_favorite_drug_id_idx
+    on drug_favorite (drug_id);

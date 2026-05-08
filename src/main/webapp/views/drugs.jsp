@@ -43,6 +43,31 @@
                 font-size: 3.5rem;
             }
         }
+
+        .favorite-inline-form {
+            display: inline-block;
+            margin: 0 .35rem 0 0;
+        }
+
+        .favorite-heart {
+            border: 0;
+            background: transparent;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: .95rem;
+            line-height: 1;
+            padding: 0 .1rem;
+            vertical-align: middle;
+        }
+
+        .favorite-heart.is-favorited {
+            color: #dc3545;
+        }
+
+        .favorite-heart:focus {
+            outline: 1px dotted #495057;
+            outline-offset: 2px;
+        }
     </style>
 </head>
 <body>
@@ -91,7 +116,23 @@
                     <tbody>
                     <c:forEach items="${drugs}" var="item">
                         <tr>
-                            <td>${item.id}</td>
+                            <td>
+                                <form action="<%=request.getContextPath()%>/drugFavorite" method="post" class="favorite-inline-form">
+                                    <input type="hidden" name="drugId" value="${item.id}">
+                                    <input type="hidden" name="returnUrl" value="<%=request.getRequestURI() + (request.getQueryString() == null ? "" : "?" + request.getQueryString())%>">
+                                    <c:choose>
+                                        <c:when test="${item.favorited}">
+                                            <input type="hidden" name="action" value="remove">
+                                            <button type="submit" class="favorite-heart is-favorited" title="Unfavorite" aria-label="Unfavorite ${item.name}">&#9829;</button>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <input type="hidden" name="action" value="add">
+                                            <button type="submit" class="favorite-heart" title="Favorite" aria-label="Favorite ${item.name}">&#9825;</button>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </form>
+                                ${item.id}
+                            </td>
                             <td>${item.name}</td>
                             <td>${item.drugUrl}</td>
                             <td>${item.biomarker}</td>
