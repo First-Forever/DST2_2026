@@ -10,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -27,6 +28,7 @@ public class IndexController {
         dispatcher.registerGetMapping("/dashboard", this::dashboard);
         dispatcher.registerGetMapping("/register", this::register);
         dispatcher.registerPostMapping("/login", this::login);
+        dispatcher.registerPostMapping("/logout", this::logout);
         dispatcher.registerPostMapping("/register", this::doRegister);
     }
 
@@ -67,6 +69,14 @@ public class IndexController {
 
         request.getSession().setAttribute("currentUser", user);
         response.sendRedirect(request.getContextPath() + "/dashboard");
+    }
+
+    public void logout(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        response.sendRedirect(request.getContextPath() + "/");
     }
 
     public void doRegister(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

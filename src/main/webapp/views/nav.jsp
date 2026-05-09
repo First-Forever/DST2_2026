@@ -8,8 +8,21 @@
 <%@ page import="cn.edu.zju.bean.User" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page isELIgnored="false" %>
+<%!
+    private String escapeHtml(String value) {
+        if (value == null) {
+            return "";
+        }
+        return value.replace("&", "&amp;")
+                .replace("<", "&lt;")
+                .replace(">", "&gt;")
+                .replace("\"", "&quot;")
+                .replace("'", "&#39;");
+    }
+%>
 <%
     User currentUser = (User) session.getAttribute("currentUser");
+    String currentUsername = currentUser == null ? "" : escapeHtml(currentUser.getUsername());
     boolean canAccessProfessionalInfo = currentUser != null
             && currentUser.isPermissionApproved()
             && (currentUser.getPermission() == User.Permission.PROFESSIONAL_USER
@@ -18,6 +31,17 @@
             && currentUser.getPermission() == User.Permission.ADMIN
             && currentUser.isAdminApproved();
 %>
+<% if (currentUser != null) { %>
+<div class="navbar-user-controls">
+    <span class="navbar-username" title="<%=currentUsername%>">
+        <span data-feather="user"></span>
+        <span><%=currentUsername%></span>
+    </span>
+    <form class="navbar-logout-form" method="post" action="<%=request.getContextPath()%>/logout">
+        <button type="submit" class="btn btn-outline-light btn-sm">Log out</button>
+    </form>
+</div>
+<% } %>
 <nav class="col-md-2 d-none d-md-block bg-light sidebar">
     <div class="sidebar-sticky">
         <ul class="nav flex-column">
